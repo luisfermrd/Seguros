@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+
+.contenedor{
+    display: flex;
+    width: 100%;
+    padding: 4% 2%;
+    box-sizing: border-box;
+    height: 80vh;
+}
+
+.box {
+    flex: 1;
+    overflow: hidden;
+    margin: 0 2%;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    line-height: 0;
+    transition: .5s;
+    -webkit-transition: .5s;
+    -moz-transition: .5s;
+    -ms-transition: .5s;
+    -o-transition: .5s;
+}
+
+.box > img{
+    width: 200%;
+    height: calc(100% - 10vh);
+    object-fit: cover;
+    transition: .5s;
+    -webkit-transition: .5s;
+    -moz-transition: .5s;
+    -ms-transition: .5s;
+    -o-transition: .5s;
+}
+
+.box > span {
+    font-size: 3.8vh;
+    font-weight: 600;
+    display: block;
+    text-align: center;
+    height: 10vh;
+    line-height: 2.6;
+}
+.box > span a {
+    text-decoration: none;
+    color: black;
+}
+
+.box:hover{
+    flex: 1 1 50%;
+}
+
+.box:hover > img {
+    height: 100%;
+    width: 100%;
+}
+
+.box:hover > span {
+    position: relative;
+    padding: 10px;
+    bottom: 450px;
+    height: 500px;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.406);
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+}
+
+.box:hover > span a{
+    display: block;
+    padding: 30%;
+    width: 100%;
+    min-height: 40%;
+}
