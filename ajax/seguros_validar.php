@@ -4,7 +4,7 @@ class Usuario{
 
     private static $instance = NULL;
     private $dbcon;
-    private $con = 0;
+    private $ip;
     private function __construct(){
 
     }
@@ -20,10 +20,36 @@ class Usuario{
         try {
             $db = self::$instance;
             $db->dbcon = mysqli_connect("localhost", "seguros_validar", "seguros_validar123","seguros");
+            $db->ip = $db->get_client_ip();
             return $db->dbcon;
         } catch (Exception $e) {
             echo "error: ".$e->getMessage();
         }
+    }
+
+    public static function get_client_ip() {
+        $ipaddress = '';
+        if (getenv('HTTP_CLIENT_IP'))
+            $ipaddress = getenv('HTTP_CLIENT_IP');
+        else if(getenv('HTTP_X_FORWARDED_FOR'))
+            $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+        else if(getenv('HTTP_X_FORWARDED'))
+            $ipaddress = getenv('HTTP_X_FORWARDED');
+        else if(getenv('HTTP_FORWARDED_FOR'))
+            $ipaddress = getenv('HTTP_FORWARDED_FOR');
+        else if(getenv('HTTP_FORWARDED'))
+           $ipaddress = getenv('HTTP_FORWARDED');
+        else if(getenv('REMOTE_ADDR'))
+            $ipaddress = getenv('REMOTE_ADDR');
+        else
+            $ipaddress = 'UNKNOWN';
+        return $ipaddress;
+    }
+
+    public static function auditoria($id, $mensaje){
+        $db = self::$instance;
+        $sql = "INSERT INTO auditoria (id_usuario, ip, descripcion) VALUES ('$id', '$db->ip', '$mensaje')";
+        $result =mysqli_query($db->dbcon,$sql);
     }
 
     public static function limpiarCadena($str) {
@@ -47,6 +73,9 @@ class Usuario{
                     $_SESSION['email']=$row['email'];
                     $_SESSION['names']=$row['names'];
                     $_SESSION['rol']=$row['rol'];
+
+                    $db->auditoria($row['id'], $email.' se logueo en el sistema');
+
                     if($row['rol'] == 0){
                         //Usuario
                         echo json_encode(array("status"=>1,"rol"=>0,"message"=>"Acceso conseguido")); 

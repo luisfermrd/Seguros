@@ -10,7 +10,7 @@ class Usuario{
 
     private static $instance = NULL;
     private $dbcon;
-    private $con = 0;
+    private $ip;
 
     private function __construct(){
 
@@ -27,6 +27,7 @@ class Usuario{
         try {
             $db = self::$instance;
             $db->dbcon = mysqli_connect("localhost", "seguros_usuario", "seguros_usuario123","seguros");
+            $db->ip = $db->get_client_ip();
             return $db->dbcon;
         } catch (Exception $e) {
             echo "error: ".$e->getMessage();
@@ -60,7 +61,32 @@ class Usuario{
 		return htmlspecialchars($str);
 	}
 
-    public static function vida($fecha_inicio, $fecha_fin, $tipo_seguro, $num_documento, $tipo_documento, $nombres, $email, $fecha_nacimiento, $sexo, $estado_civil, $celular, $direccion, $ciudad, $ingreso, $profesion, $medicamento, $cual, $eps_ips){
+    public static function get_client_ip() {
+        $ipaddress = '';
+        if (getenv('HTTP_CLIENT_IP'))
+            $ipaddress = getenv('HTTP_CLIENT_IP');
+        else if(getenv('HTTP_X_FORWARDED_FOR'))
+            $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+        else if(getenv('HTTP_X_FORWARDED'))
+            $ipaddress = getenv('HTTP_X_FORWARDED');
+        else if(getenv('HTTP_FORWARDED_FOR'))
+            $ipaddress = getenv('HTTP_FORWARDED_FOR');
+        else if(getenv('HTTP_FORWARDED'))
+           $ipaddress = getenv('HTTP_FORWARDED');
+        else if(getenv('REMOTE_ADDR'))
+            $ipaddress = getenv('REMOTE_ADDR');
+        else
+            $ipaddress = 'UNKNOWN';
+        return $ipaddress;
+    }
+
+    public static function auditoria($id, $mensaje){
+        $db = self::$instance;
+        $sql = "INSERT INTO auditoria (id_usuario, ip, descripcion) VALUES ('$id', '$db->ip', '$mensaje')";
+        $result =mysqli_query($db->dbcon,$sql);
+    }
+
+    public static function vida($fecha_inicio, $fecha_fin, $tipo_seguro, $num_documento, $tipo_documento, $nombres, $email, $fecha_nacimiento, $sexo, $estado_civil, $celular, $direccion, $ciudad, $ingreso, $profesion, $medicamento, $cual, $eps_ips, $id_usuario){
 
         $db = self::$instance;
 
@@ -79,6 +105,9 @@ class Usuario{
             if(!$r = mysqli_fetch_array($resultConsulta)){
                 $query = "INSERT INTO clientes(id, tipo_documento, names, email) VALUES ('$num_documento','$tipo_documento','$nombres','$email')";
                 $result =mysqli_query($db->dbcon,$query);
+
+                $db->auditoria($id_usuario, 'Se registro un nuevo cliente');
+
             }
 
             $query2 = "INSERT INTO vida(id_user, id_beneficiario, fecha_nacimineto, sexo, estado_civil, celular, direccion, ciudad, ingresos, profesion, medicamento, cual, eps_ips, fecha_inicio, fecha_fin, ref_pago, tipo, plan) VALUES ('$id','$num_documento','$fecha_nacimiento','$sexo','$estado_civil','$celular','$direccion','$ciudad','$ingreso','$profesion','$medicamento','$cual','$eps_ips','$fecha_inicio','$fecha_fin','$ref_pago', 'Seguro de vida', '$tipo_seguro')";
@@ -89,6 +118,9 @@ class Usuario{
             $result3 =mysqli_query($db->dbcon,$query3);
 
             if ($result2 && $result3) {
+
+                $db->auditoria($id_usuario, 'Lleno formulario de vida con ref N°'.$ref_pago);
+
                 echo json_encode(array("status"=>1,"message"=>"Se realizo el registro! ref de pago: ".$ref_pago." --- valor a pagar: ".$total, "ref_pago"=>$ref_pago));
             }else{
                 echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
@@ -118,12 +150,15 @@ class Usuario{
         
     }
 
-    public static function pagar($ref_pago){
+    public static function pagar($ref_pago, $id_usuario){
         $db = self::$instance;
         $sql = "UPDATE pagos SET pago='1',activo='1' WHERE ref_pago = '$ref_pago'";
         $result =mysqli_query($db->dbcon,$sql);
 
         if ($result) {
+
+            $db->auditoria($id_usuario, 'Realizo el pago del seguro con ref N°'.$ref_pago);
+
             echo json_encode(array("status"=>1,"message"=>"Pago registrado con exito!"));
         }else{
             echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
@@ -136,6 +171,9 @@ class Usuario{
 
         $result =mysqli_query($db->dbcon,$sql);
         if ($result) {
+
+            $db->auditoria($id, 'Solicito su registro de seguros');
+
             $data = array();
             while($row = mysqli_fetch_assoc($result)){
                 array_push($data, $row);
@@ -146,7 +184,25 @@ class Usuario{
         }
     }
 
-    public static function salir(){
+    public static function detalles($ref_pago, $id_usuario){
+        $db = self::$instance;
+        $sql = "SELECT v.id_beneficiario, c.names, c.tipo_documento, v.fecha_nacimineto, v.sexo, v.estado_civil, c.email, v.celular, v.direccion, v.ingresos, v.profesion, v.medicamento, v.cual, v.eps_ips, CONCAT(v.tipo,' (',v.plan,')') as tipo_plan, v.tipo as tipo_seguro, CONCAT(v.fecha_inicio, ' - ',v.fecha_fin) as fecha, TIMESTAMPDIFF(DAY, v.fecha_inicio, v.fecha_fin) as dif_dias, TIMESTAMPDIFF(DAY, NOW(), v.fecha_fin) as dias_restantes  FROM vida as v LEFT JOIN clientes as c ON v.id_beneficiario = c.id WHERE v.ref_pago = '$ref_pago';";
+
+        $result =mysqli_query($db->dbcon,$sql);
+        if ($result) {
+
+            $db->auditoria($id_usuario, 'Solicito detalles de su seguro con ref N°'.$ref_pago);
+
+            echo json_encode(array("status"=>1,"data"=>mysqli_fetch_assoc($result)));
+        }else{
+            echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
+        }
+    }
+
+    public static function salir($id_usuario){
+        $db = self::$instance;
+        $db->getDBConexion();
+        $db->auditoria($id_usuario, 'Salio del sistema');
         //Empezamos la sesión
         session_start();
         //Limpiamos las variables de sesión
@@ -162,6 +218,7 @@ class Usuario{
 
 $obj = Usuario::getInstance();
 
+$id_usuario = $_SESSION["id"];
 
 switch ($_GET["opcion"]){
 	case 'guardar_vida':
@@ -215,7 +272,7 @@ switch ($_GET["opcion"]){
                         if($obj->diferencia_dias_dos_fechas($fecha_inicio, $fecha_fin) < 1){
                             echo json_encode(array("status"=>-1,"message"=>"La diferencia de la fecha fin con respecto a la inicio, debe ser de por lo menos un dia."));
                         }else{
-                            $obj->vida($fecha_inicio, $fecha_fin, $tipo_seguro, $num_documento, $tipo_documento, $nombres, $email, $fecha_nacimiento, $sexo, $estado_civil, $celular, $direccion, $ciudad, $ingreso, $profesion, $medicamento, $cual, $eps_ips);
+                            $obj->vida($fecha_inicio, $fecha_fin, $tipo_seguro, $num_documento, $tipo_documento, $nombres, $email, $fecha_nacimiento, $sexo, $estado_civil, $celular, $direccion, $ciudad, $ingreso, $profesion, $medicamento, $cual, $eps_ips, $id_usuario);
                         }
                     }
                 }
@@ -256,7 +313,7 @@ switch ($_GET["opcion"]){
                         if (preg_match($patron_direccion, $direccion)) {
                             if (preg_match($patron_id, $identificacion)) {
                                 
-                                $obj->pagar($ref_pago);
+                                $obj->pagar($ref_pago, $id_usuario);
 
                             }else{
                                 echo json_encode(array("status"=>-1,"message"=>"La Identificacion no es valida.")); 
@@ -284,8 +341,14 @@ switch ($_GET["opcion"]){
 		$obj->misSeguros($id);
 	break;
 
+    case 'detalles':
+        $conexion = $obj->getDBConexion();
+        $ref_pago=isset($_POST["ref_pago"])? $obj->limpiarCadena($_POST["ref_pago"]):"";
+		$obj->detalles($ref_pago, $id_usuario);
+	break;
+
 	case 'cerrar_sesion':
-		$obj->salir();
+		$obj->salir($id_usuario);
 	break;
 
     default:

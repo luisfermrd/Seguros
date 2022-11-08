@@ -32,7 +32,7 @@ async function cargarTabla(){
                             activo = "<p class='text-light bg-success text-center rounded ms-1 me-1'>Si</p>";
                         }
 
-                        let detalle2 = `<a onclick='detalles("${element.id_beneficiario}")' class='text-decoration-none text-light bg-warning text-center rounded ms-1 me-1 p-1' role='button'>Detalles</a>`;
+                        let detalle2 = `<a onclick='detalles("${element.ref_pago}")' class='text-decoration-none text-light bg-warning text-center rounded ms-1 me-1 p-1' role='button'>Detalles</a>`;
 
                         let detalle3 = `<a onclick='reclamar("${element.ref_pago}")' class='text-decoration-none text-light bg-success text-center rounded ms-1 me-1 p-1' role='button'>Reclamar</a>`;
 
