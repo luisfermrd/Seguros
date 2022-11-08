@@ -80,12 +80,17 @@ async function cancelarSub(ref_pago){
     if (confirm("¿Seguro que desea cancelar este seguro? no tendra devolucion del dinero ya pagado!")) {
         await $.ajax({
             type: "post",
-            url: '../controller/cancelar.php?ref='+ref_pago,
+            url: '../ajax/seguros_usuario.php?opcion=cancelar_seguro&ref='+ref_pago,
             data: null,
             contentType: false,
             processData: false,
             success: function (response) {
-                    window.location.reload()
+                if (response.status == 1) {
+                    alert(response.message);
+                    window.location.reload();
+                }else{
+                    alert(response.message);
+                }
             }
         });
     }

@@ -12,7 +12,7 @@ async function reclamar() {
     $data = new FormData(form);
     await $.ajax({
         type: "post",
-        url: "../controller/reclamar.php",
+        url: "../ajax/seguros_usuario.php?opcion=reclamar",
         data: $data,
         contentType: false,
         processData: false,
