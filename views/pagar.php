@@ -14,21 +14,6 @@ else{
 
     $ref_pago = $_GET["ref"];
 
-    include_once("../config/conexion.php");
-
-    $sql = "SELECT * FROM pagos WHERE ref_pago = '$ref_pago'";
-    $sql2 = "SELECT tipo, plan FROM vida WHERE ref_pago = '$ref_pago'";
-
-    $result =mysqli_query($conexion,$sql);
-    $result2 =mysqli_query($conexion,$sql2);
-
-    if(!$row = mysqli_fetch_array($result)){
-        header("Location: principal.php");
-    }
-    if(!$row2 = mysqli_fetch_array($result2)){
-        header("Location: principal.php");
-    }
-
 
 include_once('header.php');
 ?>
@@ -37,10 +22,13 @@ include_once('header.php');
 <main class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
 
     <div class="rounded m-4" style="width: 500px; height: 580px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
-        <h2 class="text-center p-3"><?php echo $row2['tipo']." (".$row2['plan'].")" ?></h2>
+        <h2 class="text-center p-3" id="tipo"></h2>
         <p class="ms-4">Referencia de pago N° <?php echo $ref_pago ?></p>
-        <p class="ms-4">Total a pagar: $<?php echo $row['valor'] ?> pesos.</p>
+        <p class="ms-4">Total a pagar: $ <span id="valor"></span> pesos.</p>
         <div>
+            <form id="formulario2" method="post">
+                <input type="hidden" value="<?php echo $ref_pago ?>" name="ref_pago">
+            </form>
             <form id="formulario" method="post" >
                 <div>
                     <input type="hidden" value="<?php echo $ref_pago ?>" name="ref_pago">
@@ -93,6 +81,32 @@ include_once('header.php');
     </div>
 
 </main>
+
+    <script>
+        async function cargarInfo() {
+            let form = $("#formulario2")[0];
+            $data = new FormData(form);
+            await $.ajax({
+                type: "post",
+                url: "../ajax/seguros_usuario.php?opcion=info_ref",
+                data: $data,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response.status == 1) {
+                        $("#tipo").html(response.tipo);
+                        $("#valor").html(response.valor);
+                    }else{
+                        alert(response.message);
+                        document.location.href = `principal.php`;
+                    }
+                }
+            });
+        }
+        setTimeout(() => {
+            cargarInfo();
+        }, 100);
+    </script>
 
     <!--jquey -->
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>

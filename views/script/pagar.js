@@ -12,7 +12,7 @@ async function pagar() {
     $data = new FormData(form);
     await $.ajax({
         type: "post",
-        url: "../controller/pagar.php",
+        url: "../ajax/seguros_usuario.php?opcion=pagar_seguro",
         data: $data,
         contentType: false,
         processData: false,

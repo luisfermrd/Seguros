@@ -22,7 +22,7 @@ async function vida() {
     $data = new FormData(form);
     await $.ajax({
         type: "post",
-        url: "../controller/vida.php",
+        url: "../ajax/seguros_usuario.php?opcion=guardar_vida",
         data: $data,
         contentType: false,
         processData: false,
