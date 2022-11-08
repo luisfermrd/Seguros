@@ -22,11 +22,10 @@ async function login() {
                 }else{
                     $(location).attr("href","../views_admin/principal.php");
                 }
+                form.reset();
             }else{
                 alert(response.message);
             }
         }
     });
-
-    form.reset();
 }

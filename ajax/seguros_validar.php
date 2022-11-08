@@ -96,6 +96,56 @@ class Usuario{
         }
     }
 
+    public static function registrar($id,$names,$tipo_documento,$email,$password){
+        $db = self::$instance;
+        $sql="SELECT * FROM usuarios WHERE email='$email' OR id='$id'";
+        $result =mysqli_query($db->dbcon,$sql);
+
+        if(!$row = mysqli_fetch_array($result)){
+            $pass = password_hash($password, PASSWORD_DEFAULT, ['cost' => 15]);
+            $query1 = "INSERT INTO usuarios(id, tipo_documento, names, email, password) VALUES ('$id','$tipo_documento','$names','$email','$pass')";
+            $result1 =mysqli_query($db->dbcon,$query1);
+
+            if($result1){
+                $db->auditoria($id, $email.' se registro en el sistema');
+
+                echo json_encode(array("status"=>1,"message"=>"Usuario registrado!"));
+            }else{
+                echo json_encode(array("status"=>-1,"message"=>"Error al registrar al usuario."));
+            }
+            
+        }else{
+            echo json_encode(array("status"=>-1,"message"=>"Ya existe un usuario con estos datos"));
+        }
+    }
+
+    public static function diferencia_dias($fecha_ini){
+        $ini = new DateTime($fecha_ini);
+        $ahora = new DateTime(date("Y-m-d"));
+        $diferencia = $ahora->diff($ini);
+        return $diferencia->format("%R%a");
+    }
+    
+    public static function diferencia_dias_dos_fechas($fecha_ini , $fecha_fin){
+        $ini = new DateTime($fecha_ini);
+        $fin = new DateTime($fecha_fin);
+        $diferencia = $ini->diff($fin);
+        return $diferencia->format("%R%a");
+    }
+
+    public static function cotizar($numero, $seguro, $tipo_seguro, $fecha_inicio, $fecha_fin){
+        $db = self::$instance;
+        $sql="SELECT * FROM cotizar WHERE tipo = '$seguro'";
+        $result =mysqli_query($db->dbcon,$sql);
+
+        if($row = mysqli_fetch_array($result)){
+            $diferencia_dias = $db->diferencia_dias_dos_fechas($fecha_inicio, $fecha_fin);
+            $total = intval($diferencia_dias)*$row["$tipo_seguro"]*$numero;
+            echo json_encode(array("status"=>1,"message"=>"Todo bien!", "numero"=>"Número de asegurados: ".$numero, "dias"=>$diferencia_dias." dias (".$fecha_inicio." - ".$fecha_fin.")", "plan" => $tipo_seguro." x ".$numero, "total" => $total));
+        }else{
+            echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
+        }
+    }
 
 }
 
@@ -116,11 +166,43 @@ switch ($_GET["opcion"]){
 	break;
 
 	case 'registrar':
-		
+        $conexion = $obj->getDBConexion();
+        $email=isset($_POST["email"])? $obj->limpiarCadena($_POST["email"]):"";
+        $password=isset($_POST["password"])? $obj->limpiarCadena($_POST["password"]):"";
+        $tipo_documento=isset($_POST["tipo_documento"])? $obj->limpiarCadena($_POST["tipo_documento"]):"";
+        $id=isset($_POST["id"])? $obj->limpiarCadena($_POST["id"]):"";
+        $names=isset($_POST["names"])? $obj->limpiarCadena($_POST["names"]):"";
+        
+        
+        if(empty($id) || empty($names) || empty($tipo_documento) || empty($email) || empty($password)){
+            echo json_encode(array("status"=>-1,"message"=>"Debe llenar todos los campos!"));
+        }else{
+            $obj->registrar($id, $names, $tipo_documento, $email, $password);
+        }
 	break;
 
 	case 'cotizar':
-		
+        $conexion = $obj->getDBConexion();
+        $numero=isset($_POST["num_personas"])? $obj->limpiarCadena($_POST["num_personas"]):"";
+        $seguro=isset($_POST["seguro"])? $obj->limpiarCadena($_POST["seguro"]):"";
+        $tipo_seguro=isset($_POST["tipo_seguro"])? $obj->limpiarCadena($_POST["tipo_seguro"]):"";
+        $fecha_inicio=isset($_POST["fecha_inicio"])? $obj->limpiarCadena($_POST["fecha_inicio"]):"";
+        $fecha_fin=isset($_POST["fecha_fin"])? $obj->limpiarCadena($_POST["fecha_fin"]):"";
+
+        
+        if ($obj->diferencia_dias($fecha_inicio) < -1) {
+            echo json_encode(array("status"=>-1,"message"=>"La fecha inicial no puede ser menor a la actual")); 
+        }else{
+            if ($numero < 1) {
+                echo json_encode(array("status"=>-1,"message"=>"Debe cotizar por lo menos para 1 persona, vehiculo o vivienda")); 
+            }else{
+                if($obj->diferencia_dias_dos_fechas($fecha_inicio, $fecha_fin) < 1){
+                    echo json_encode(array("status"=>-1,"message"=>"La diferencia de la fecha fin con respecto a la inicio, debe ser de por lo menos un dia."));
+                }else{
+                    $obj->cotizar($numero, $seguro, $tipo_seguro, $fecha_inicio, $fecha_fin);
+                }
+            }
+        }
 	break;
 }
 

@@ -22,7 +22,7 @@ async function cotizar() {
     $data = new FormData(form);
     await $.ajax({
         type: "post",
-        url: "../controller/cotizar.php",
+        url: "../ajax/seguros_validar.php?opcion=cotizar",
         data: $data,
         contentType: false,
         processData: false,

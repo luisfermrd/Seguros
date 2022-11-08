@@ -11,14 +11,17 @@ async function saveUser() {
     $data = new FormData(form);
     await $.ajax({
         type: "post",
-        url: "../controller/registrar.php",
+        url: "../ajax/seguros_validar.php?opcion=registrar",
         data: $data,
         contentType: false,
         processData: false,
         success: function (response) {
-            alert(response);
+            if (response.status == 1) {
+                alert(response.message);
+                form.reset();
+            }else{
+                alert(response.message);
+            }
         }
     });
-
-    form.reset();
 }
