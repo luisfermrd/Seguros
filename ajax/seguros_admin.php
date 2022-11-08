@@ -2,8 +2,8 @@
 header('Content-type:application/json;charset=utf-8');
 session_start();
 
-if (!isset($_SESSION["names"]) || $_SESSION['rol'] != 0) {
-    header("Location: login.php");
+if (!isset($_SESSION["names"]) || $_SESSION['rol'] != 1) {
+    header("Location: ../views/login.php");
 }
 
 class Admin{
@@ -63,58 +63,59 @@ class Admin{
         return htmlspecialchars($str);
     }
 
-    public static function login($email, $password){
+    public static function cargarUsuario($id){
         $db = self::$instance;
+        $db->getDBConexion();
+        $sql = "SELECT * FROM `usuarios`";
+        $result =mysqli_query($db->dbcon,$sql);
+        if ($result) {
 
-        $sql = "SELECT * FROM usuarios WHERE email='$email'";
-        $result = mysqli_query($db->dbcon, $sql);
+            $db->auditoria($id, 'Solicito usuarios del sistema');
 
-        if ($row = mysqli_fetch_array($result)) {
-            if (password_verify($password, $row['password'])) {
-                if ($row['active'] == 1) {
-                    session_start();
-                    $_SESSION['id'] = $row['id'];
-                    $_SESSION['tipo_documento'] = $row['tipo_documento'];
-                    $_SESSION['email'] = $row['email'];
-                    $_SESSION['names'] = $row['names'];
-                    $_SESSION['rol'] = $row['rol'];
-
-                    $db->auditoria($row['id'], $email . ' se logueo en el sistema');
-
-                    if ($row['rol'] == 0) {
-                        //Usuario
-                        echo json_encode(array("status" => 1, "rol" => 0, "message" => "Acceso conseguido"));
-                    } else {
-                        //Admin
-                        echo json_encode(array("status" => 1, "rol" => 1, "message" => "Acceso conseguido"));
-                    }
-                } else {
-                    echo json_encode(array("status" => -1, "message" => "Usuario desactivado por el administrador, pongase en contacto con nosotros."));
-                }
-            } else {
-                echo json_encode(array("status" => -1, "message" => "Usuario/contraseña incorrectos!"));
+            $data = array();
+            while($row = mysqli_fetch_assoc($result)){
+                array_push($data, $row);
             }
-        } else {
-            echo json_encode(array("status" => -1, "message" => "Usuario/contraseña incorrectos!"));
+            echo json_encode(array("status"=>1,"data"=>$data));
+        }else{
+            echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
         }
     }
+
+    public static function desactivarUsuario($id, $id_usuario){
+        $db = self::$instance;
+        $sql="UPDATE usuarios SET active='0' WHERE id = '$id'";
+        $result =mysqli_query($db->dbcon,$sql);
+
+        if($result){
+            $db->auditoria($id_usuario, 'Desactivo al usuario con id: '.$id_usuario);
+            echo json_encode(array("status"=>1,"message"=>"El ususario con el id: ".$id.", se ha desactivado!"));
+        }else{
+            echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
+        }
+    }
+
+    public static function activarUsuario($id, $id_usuario){
+        $db = self::$instance;
+        $sql="UPDATE usuarios SET active='1' WHERE id = '$id'";
+
+        $result =mysqli_query($db->dbcon,$sql);
+        
+        if($result){
+            $db->auditoria($id_usuario, 'Activo al usuario con id: '.$id_usuario);
+            echo json_encode(array("status"=>1,"message"=>"El ususario con el id: ".$id.", se ha activado!"));
+        }else{
+            echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
+        }
+    }
+
 }
 
 $obj = Admin::getInstance();
 
+$id_usuario = $_SESSION["id"];
 
 switch ($_GET["opcion"]) {
-    case 'login':
-        $conexion = $obj->getDBConexion();
-        $email = isset($_POST["email"]) ? $obj->limpiarCadena($_POST["email"]) : "";
-        $password = isset($_POST["password"]) ? $obj->limpiarCadena($_POST["password"]) : "";
-
-        if (empty($email) || empty($password)) {
-            echo json_encode(array("status" => -1, "message" => "Debe llenar todos los campos!"));
-        } else {
-            $obj->login($email, $password);
-        }
-    break;
 
     case 'registrar':
         $conexion = $obj->getDBConexion();
@@ -169,37 +170,27 @@ switch ($_GET["opcion"]) {
 
     case 'desactivar_user':
         $conexion = $obj->getDBConexion();
-        $id = $_GET['id'];
+        $id=isset($_GET["id"])? $obj->limpiarCadena($_GET["id"]):"";
 
         if(empty($id)){
             echo json_encode(array("status"=>-1,"message"=>"Error, no se recibio la referencia"));
         }else{
-            $sql="UPDATE usuarios SET active='0' WHERE id = '$id'";
-            $result =mysqli_query($conexion,$sql);
-
-            if($result){
-                echo json_encode(array("status"=>1,"message"=>"El ususario con el id: ".$id.", se ha desactivado!"));
-            }else{
-                echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
-            }
+            $obj->desactivarUsuario($id, $id_usuario);
         }
     break;
 
     case 'activar_user':
-    $conexion = $obj->getDBConexion();
-    $id = $_GET['id'];
+        $conexion = $obj->getDBConexion();
+        $id=isset($_GET["id"])? $obj->limpiarCadena($_GET["id"]):"";
 
-    if(empty($id)){
-        echo json_encode(array("status"=>-1,"message"=>"Error, no se recibio la referencia"));
-    }else{
-        $sql="UPDATE usuarios SET active='1' WHERE id = '$id'";
-        $result =mysqli_query($conexion,$sql);
-
-        if($result){
-            echo json_encode(array("status"=>1,"message"=>"El ususario con el id: ".$id.", se ha desactivado!"));
+        if(empty($id)){
+            echo json_encode(array("status"=>-1,"message"=>"Error, no se recibio la referencia"));
         }else{
-            echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
+            $obj->activarUsuario($id, $id_usuario);
         }
-    }
+    break;
+
+    case 'usuarios':
+        $obj->cargarUsuario($id_usuario);
     break;
 }

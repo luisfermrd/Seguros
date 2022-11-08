@@ -9,12 +9,6 @@ if (!isset($_SESSION["names"]) || $_SESSION['rol'] != 1){
 else
 {
 
-  $sql = "SELECT * FROM `usuarios`";
-
-  include_once("../config/conexion.php");
-
-  $result =mysqli_query($conexion,$sql);
-
 include_once('header.php');
 ?>
 
@@ -25,10 +19,6 @@ include_once('header.php');
     <h1>Usuarios</h1>
     
     <article class="p-3">
-        <?php
-          if($result){
-        ?>
-
         <div class="table-responsive rounded">
           <table class="table table-striped table-hover rounded">
             <thead>
@@ -41,42 +31,11 @@ include_once('header.php');
                 <th scope="col">Opciones</th>
               </tr>
             </thead>
-            <tbody>
-              <?php
-                while($row = mysqli_fetch_array($result)){
-                  if($row['rol'] == 0){
-                    if($row['active'] == 0){
-                      $activo = "<p class='text-light bg-danger text-center rounded ms-1 me-1'>Inactivo</p>";
-                      $detalle = "<a onclick='activar(".$row['id'].")' class='text-decoration-none text-light bg-success text-center rounded ms-1 me-1 p-1' role='button'>Activar</a>";
-                    }else{
-                      $activo = "<p class='text-light bg-success text-center rounded ms-1 me-1'>Activo</p>";
-                      $detalle = "<a onclick='desactivar(".$row['id'].")' class='text-decoration-none text-light bg-danger text-center rounded ms-1 me-1 p-1' role='button'>Desactivar</a>";
-                    }
-
-                    ?>
-                        <td scope="row"><?php echo $row['id'] ?></td>
-                        <td scope="row"><?php echo $row['tipo_documento'] ?></td>
-                        <td scope="row"><?php echo $row['names'] ?></td>
-                        <td scope="row"><?php echo $row['email'] ?></td>
-                        <td scope="row"><?php echo $activo ?></td>
-                        <td scope="row"><?php echo $detalle ?></td>
-                        
-                      </tr>
-                    <?php
-                  }
-                }
-              ?>
+            <tbody id="datosTabla">
+              
             </tbody>
           </table>
         </div>
-
-        <?php
-        }else{
-        ?>
-          <p>No tienes solicitudes registradas!</p>
-        <?php
-        }
-        ?>
     </article>
   </div>
 

@@ -3,7 +3,7 @@ header('Content-type:application/json;charset=utf-8');
 session_start();
 
 if (!isset($_SESSION["names"]) || $_SESSION['rol'] != 0){
-    header("Location: login.php");
+    header("Location: ../views/login.php");
 }
 
 class Usuario{
