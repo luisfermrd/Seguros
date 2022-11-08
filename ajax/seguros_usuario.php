@@ -199,6 +199,35 @@ class Usuario{
         }
     }
 
+    public static function cancelarSeguro($ref_pago, $id_usuario){
+        $db = self::$instance;
+        $sql="UPDATE pagos SET cancelado='1' WHERE ref_pago = '$ref_pago'";
+        $result =mysqli_query($db->dbcon,$sql);
+
+        if($result){
+            $db->auditoria($id_usuario, 'Cancelo el seguro con ref N°'.$ref_pago);
+            echo json_encode(array("status"=>1,"message"=>"El seguro con referencia: ".$ref_pago." se ha cancelado!"));
+        }else{
+            echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
+        }
+    }
+
+    public static function reclamarSeguro($ref_pago, $id_usuario){
+        $db = self::$instance;
+
+        $sql = "UPDATE pagos SET reclamado='1' WHERE ref_pago = '$ref_pago'";
+        $result =mysqli_query($db->dbcon,$sql);
+        $sql2 = "INSERT INTO solicitudes(ref_pago) VALUES ('$ref_pago')";
+        $result2 =mysqli_query($db->dbcon,$sql2);
+
+        if ($result && $result2) {
+            $db->auditoria($id_usuario, 'Ha solicitado reclamar su seguro con ref N°'.$ref_pago);
+            echo json_encode(array("status"=>1,"message"=>"Su solicitud esta siendo procesada! en pocos dias un acesor se contactara con usted"));
+        }else{
+            echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
+        }
+    }
+
     public static function salir($id_usuario){
         $db = self::$instance;
         $db->getDBConexion();
@@ -346,6 +375,50 @@ switch ($_GET["opcion"]){
         $ref_pago=isset($_POST["ref_pago"])? $obj->limpiarCadena($_POST["ref_pago"]):"";
 		$obj->detalles($ref_pago, $id_usuario);
 	break;
+
+    case 'cancelar_seguro':
+        $ref_pago = $_GET['ref'];
+        $conexion = $obj->getDBConexion();
+        $ref_pago=isset($_GET['ref'])? $obj->limpiarCadena($_GET['ref']):"";
+
+        if(empty($ref_pago)){
+            echo json_encode(array("status"=>-1,"message"=>"Error, no se recibio la referencia"));
+        }else{
+            $obj->cancelarSeguro($ref_pago , $id_usuario);
+        }
+    break;
+
+    case 'reclamar':
+        $conexion = $obj->getDBConexion();
+        $ref_pago=isset($_POST['ref_pago'])? $obj->limpiarCadena($_POST['ref_pago']):"";
+        $pdfFile = $_FILES['archivo']['name'];
+        $tmp_dir = $_FILES['archivo']['tmp_name'];
+        $pdfSize = $_FILES['archivo']['size'];
+        
+        if (!empty($ref_pago) && !empty($pdfFile)) {
+            $upload_dir = '../archivos/';
+        
+            $pdfExt = strtolower(pathinfo($pdfFile,PATHINFO_EXTENSION));
+        
+            $valid_extensions = array('pdf');
+        
+            $userpic = $ref_pago.".".$pdfExt;
+            if(in_array($pdfExt, $valid_extensions)){
+                if($pdfSize < 1000000){
+                    move_uploaded_file($tmp_dir,$upload_dir.$userpic);
+                    
+                    $obj->reclamarSeguro($ref_pago, $id_usuario);
+
+                }else{
+                    echo json_encode(array("status"=>-1,"message"=>"Error, su pdf es muy grande"));
+                }
+            }else{
+                echo json_encode(array("status"=>-1,"message"=>"Error, el documento no es un pdf"));
+            }
+        }else{
+            echo json_encode(array("status"=>-1,"message"=>"Error, no se recibio el archivo")); 
+        }
+    break;
 
 	case 'cerrar_sesion':
 		$obj->salir($id_usuario);
