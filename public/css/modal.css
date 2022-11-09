@@ -34,3 +34,19 @@
     justify-content: space-around;
     padding: 20px;
 }
+
+.icon{
+    position: relative;
+    top: 0;
+    left: 0;
+    min-width: 280px;
+    font-size: 5em;
+    opacity: 0.2;
+}
+
+.numero{
+    position: absolute;
+    top: 0;
+    right: 20px;
+    font-size: 4em;
+}

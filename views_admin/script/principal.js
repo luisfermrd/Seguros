@@ -9,7 +9,10 @@ async function info(){
         processData: false,
         success: function (response) {
             if (response.status == 1) {
-                console.log(response.data)
+                $("#clientes").html(response.data.num_clientes);
+                $("#usuarios").html(response.data.num_usuarios);
+                $("#admins").html(response.data.num_admin);
+                $("#total").html(response.data.total_recuado);
             }
         }
     });
