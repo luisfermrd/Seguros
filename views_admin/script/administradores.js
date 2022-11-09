@@ -1,5 +1,9 @@
 $(document).ready(function () {
     cargarTabla();
+    $('#formulario').on("submit",function (e) { 
+        e.preventDefault();
+        saveUser();
+    });
 });
 
 async function cargarTabla(){
@@ -12,7 +16,7 @@ async function cargarTabla(){
             if (response.status == 1) {
                 let html = "";
                 response.data.forEach(element => {
-                    if(element.rol == 0){
+                    if(element.rol == 1){
                         let activo, detalle;
                         if(element.active == 0){
                           activo = "<p class='text-light bg-danger text-center rounded ms-1 me-1'>Inactivo</p>";
@@ -78,3 +82,36 @@ async function activar(id){
         });
     }
 }
+
+
+async function saveUser() {
+
+    let form = $("#formulario")[0];
+    $data = new FormData(form);
+    await $.ajax({
+        type: "post",
+        url: "../ajax/seguros_admin.php?opcion=save_admin",
+        data: $data,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+            if (response.status == 1) {
+                alert(response.message)
+                window.location.reload()
+            }else{
+                alert(response.message)
+            }
+        }
+    });
+
+    form.reset();
+}
+
+
+document.querySelector("#nuevoEvento").addEventListener("click", () =>{
+    document.querySelector(".modal").classList.toggle("oculto")
+})
+
+document.querySelector("#cerrar").addEventListener("click", () =>{
+    document.querySelector(".modal").classList.toggle("oculto")
+})

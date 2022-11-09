@@ -82,6 +82,53 @@ class Admin{
         }
     }
 
+    public static function info($id_usuario){
+        $db = self::$instance;
+        $db->getDBConexion();
+        $sql = "SELECT COUNT(id) as num_clientes FROM clientes";
+        $sql2 = "SELECT COUNT(id) as num_usuarios FROM usuarios WHERE rol = '0'";
+        $sql3 = "SELECT COUNT(id) as num_admin FROM usuarios WHERE rol = '1'";
+        $sql4 = "SELECT SUM(valor) as total_recuado FROM pagos WHERE pago = '1'";
+
+        $result =mysqli_query($db->dbcon,$sql);
+        $row = mysqli_fetch_array($result);
+        $result2 =mysqli_query($db->dbcon,$sql2);
+        $row2 = mysqli_fetch_array($result2);
+        $result3 =mysqli_query($db->dbcon,$sql3);
+        $row3 = mysqli_fetch_array($result3);
+        $result4 =mysqli_query($db->dbcon,$sql4);
+        $row4 = mysqli_fetch_array($result4);
+
+        $db->auditoria($id_usuario, 'Esta en el inicio de admin');
+
+        $data = array("num_clientes"=>$row['num_clientes'],
+                    "num_usuarios"=>$row2['num_usuarios'],
+                    "num_admin"=>$row3['num_admin'],
+                    "total_recuado"=>$row4['total_recuado']);
+
+        echo json_encode(array("status"=>1,"data"=>$data));
+    }
+
+    public static function solicitudes($id_usuario){
+        $db = self::$instance;
+        $db->getDBConexion();
+
+        $sql = "SELECT * FROM solicitudes as s LEFT JOIN vida as v ON s.ref_pago = v.ref_pago LEFT JOIN clientes as m ON v.id_beneficiario = m.id";
+        $result =mysqli_query($db->dbcon,$sql);
+        if ($result) {
+
+            $db->auditoria($id_usuario, 'Solicito las solicitudes de los usuarios');
+
+            $data = array();
+            while($row = mysqli_fetch_assoc($result)){
+                array_push($data, $row);
+            }
+            echo json_encode(array("status"=>1,"data"=>$data));
+        }else{
+            echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
+        }
+    }
+
     public static function desactivarUsuario($id, $id_usuario){
         $db = self::$instance;
         $sql="UPDATE usuarios SET active='0' WHERE id = '$id'";
@@ -97,6 +144,7 @@ class Admin{
 
     public static function activarUsuario($id, $id_usuario){
         $db = self::$instance;
+
         $sql="UPDATE usuarios SET active='1' WHERE id = '$id'";
 
         $result =mysqli_query($db->dbcon,$sql);
@@ -109,6 +157,45 @@ class Admin{
         }
     }
 
+    public static function aprovar($ref_pago, $id_usuario){
+        $db = self::$instance;
+
+        $sql="UPDATE pagos SET reclamado='2' WHERE ref_pago = '$ref_pago'";
+        $sq2="UPDATE solicitudes SET estado='1' WHERE ref_pago = '$ref_pago'";
+        $result =mysqli_query($db->dbcon,$sql);
+        $result2 =mysqli_query($db->dbcon,$sq2);
+
+        if($result && $result2){
+            $db->auditoria($id_usuario, 'Aprovo el seguro con ref N°: '.$ref_pago);
+            echo json_encode(array("status"=>1,"message"=>"El seguro con referencia: ".$ref_pago." ha sido aprovado!"));
+        }else{
+            echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
+        }
+    }
+
+    public static function registrar($id,$names,$tipo_documento,$email,$password, $id_usuario){
+        $db = self::$instance;
+        $sql="SELECT * FROM usuarios WHERE email='$email' OR id='$id'";
+        $result =mysqli_query($db->dbcon,$sql);
+
+        if(!$row = mysqli_fetch_array($result)){
+            $pass = password_hash($password, PASSWORD_DEFAULT, ['cost' => 15]);
+            $query1 = "INSERT INTO usuarios(id, tipo_documento, names, email, password, rol) VALUES ('$id','$tipo_documento','$names','$email','$pass', '1')";
+            $result1 =mysqli_query($db->dbcon,$query1);
+
+            if($result1){
+                $db->auditoria($id_usuario, 'Registro un nuevo administrador');
+
+                echo json_encode(array("status"=>1,"message"=>"Usuario registrado!"));
+            }else{
+                echo json_encode(array("status"=>-1,"message"=>"Error al registrar al usuario."));
+            }
+            
+        }else{
+            echo json_encode(array("status"=>-1,"message"=>"Ya existe un usuario con estos datos"));
+        }
+    }
+
 }
 
 $obj = Admin::getInstance();
@@ -116,38 +203,6 @@ $obj = Admin::getInstance();
 $id_usuario = $_SESSION["id"];
 
 switch ($_GET["opcion"]) {
-
-    case 'registrar':
-        $conexion = $obj->getDBConexion();
-        $tipo_documento = $_POST['tipo_documento'];
-        $id = $_POST['id'];
-        $names = $_POST['names'];
-        $email = $_POST['email'];
-        $password = $_POST['password'];
-
-
-        if (empty($id) || empty($names) || empty($tipo_documento) || empty($email) || empty($password)) {
-            echo "Debe llenar todos los campos!";
-        } else {
-            $sql = "SELECT * FROM usuarios WHERE email='$email' OR id='$id'";
-            $result = mysqli_query($conexion, $sql);
-
-            if (!$row = mysqli_fetch_array($result)) {
-                $pass = password_hash($password, PASSWORD_DEFAULT, ['cost' => 15]);
-                $query1 = "INSERT INTO usuarios(id, tipo_documento, names, email, password, rol) VALUES ('$id','$tipo_documento','$names','$email','$pass', '1')";
-                $result1 = mysqli_query($conexion, $query1);
-
-                if ($result1) {
-                    echo "Usuario registrado!";
-                } else {
-                    echo "Error al registrar al usuario.";
-                }
-            } else {
-                echo  "Ya existe un usuario con estos datos";
-            }
-        }
-    break;
-
     case 'aprobar':
         $conexion = $obj->getDBConexion();
         $ref_pago = $_GET['ref'];
@@ -192,5 +247,40 @@ switch ($_GET["opcion"]) {
 
     case 'usuarios':
         $obj->cargarUsuario($id_usuario);
+    break;
+
+    case 'solicitudes':
+        $obj->solicitudes($id_usuario);
+    break;
+
+    case 'aprovar':
+        $conexion = $obj->getDBConexion();
+        $ref_pago=isset($_GET["ref"])? $obj->limpiarCadena($_GET["ref"]):"";
+
+        if(empty($ref_pago)){
+            echo json_encode(array("status"=>-1,"message"=>"Error, no se recibio la referencia"));
+        }else{
+            $obj->aprovar($ref_pago, $id_usuario);
+        }
+    break;
+
+    case 'save_admin':
+        $conexion = $obj->getDBConexion();
+        $email=isset($_POST["email"])? $obj->limpiarCadena($_POST["email"]):"";
+        $password=isset($_POST["password"])? $obj->limpiarCadena($_POST["password"]):"";
+        $tipo_documento=isset($_POST["tipo_documento"])? $obj->limpiarCadena($_POST["tipo_documento"]):"";
+        $id=isset($_POST["id"])? $obj->limpiarCadena($_POST["id"]):"";
+        $names=isset($_POST["names"])? $obj->limpiarCadena($_POST["names"]):"";
+        
+        
+        if(empty($id) || empty($names) || empty($tipo_documento) || empty($email) || empty($password)){
+            echo json_encode(array("status"=>-1,"message"=>"Debe llenar todos los campos!"));
+        }else{
+            $obj->registrar($id, $names, $tipo_documento, $email, $password, $id_usuario);
+        }
+    break;
+
+    case 'info':
+        $obj->info($id_usuario);
     break;
 }

@@ -15,9 +15,41 @@ include_once('header.php');
 
 <main>
 
+  <section class=" d-flex pt-5 pb-5 flex-wrap justify-content-around">
+    <div class="card text-bg-primary mb-3" style="max-width: 18rem;">
+      <div class="card-header">Numero de clientes</div>
+      <div class="card-body">
+        <div>
 
+        </div>
+      </div>
+    </div>
+    <div class="card text-bg-secondary mb-3" style="max-width: 18rem;">
+      <div class="card-header">Numero de usuarios</div>
+      <div class="card-body">
+      
+      </div>
+    </div>
+    <div class="card text-bg-success mb-3" style="max-width: 18rem;">
+      <div class="card-header">Numero de admins</div>
+      <div class="card-body">
+        
+      </div>
+    </div>
+    <div class="card text-bg-dark mb-3" style="max-width: 18rem;">
+      <div class="card-header">Total recaudado</div>
+      <div class="card-body">
+        
+      </div>
+    </div>
+  </section>
 
 </main>
+
+    <!--jquey -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+
+    <script src="script/principal.js"></script>
 
 
 <?php

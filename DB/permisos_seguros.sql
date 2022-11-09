@@ -29,7 +29,7 @@ GRANT SELECT ON seguros.cotizar TO 'seguros_usuario'@'localhost';
 GRANT INSERT ON seguros.auditoria TO 'seguros_usuario'@'localhost';
 
 /*Permisos para el usuario seguros_admin*/
-GRANT UPDATE ON seguros.pagos TO 'seguros_admin'@'localhost';
+GRANT UPDATE, SELECT ON seguros.pagos TO 'seguros_admin'@'localhost';
 GRANT UPDATE, SELECT ON seguros.solicitudes TO 'seguros_admin'@'localhost';
 GRANT SELECT, UPDATE, INSERT ON seguros.usuarios TO 'seguros_admin'@'localhost';
 GRANT SELECT ON seguros.vida TO 'seguros_admin'@'localhost';
