@@ -196,6 +196,36 @@ class Admin{
         }
     }
 
+    public static function cargarPlan(){
+        $db = self::$instance;
+        $db->getDBConexion();
+        $sql = "SELECT * FROM `cotizar`";
+        $result =mysqli_query($db->dbcon,$sql);
+        if ($result) {
+            $data = array();
+            while($row = mysqli_fetch_assoc($result)){
+                array_push($data, $row);
+            }
+            echo json_encode(array("status"=>1,"data"=>$data));
+        }else{
+            echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
+        }
+    }
+
+    // terminar de hacer 
+    public static function actualizarPlan($id){
+        $db = self::$instance;
+        $sql="UPDATE cotizar SET basico='basico',estandar='estandar',premiun='premiun' WHERE id = '$id'";
+        $result =mysqli_query($db->dbcon,$sql);
+
+        if($result){
+            $db->auditoria($id, 'Modifico los precios del plan con id: '.$id);
+            echo json_encode(array("status"=>1,"message"=>"El ususario con el id: ".$id.", se ha modificado!"));
+        }else{
+            echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
+        }
+    }
+
 }
 
 $obj = Admin::getInstance();
@@ -282,5 +312,13 @@ switch ($_GET["opcion"]) {
 
     case 'info':
         $obj->info($id_usuario);
+    break;
+
+    case 'cotizar':
+        $obj->cargarPlan();
+    break;
+
+    case 'modificacionPlan':
+        $obj->actualizarPlan($id);
     break;
 }

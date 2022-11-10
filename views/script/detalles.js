@@ -14,25 +14,92 @@ async function cargarDatos() {
                             </div>`;
                 if (response.data.tipo_seguro == "Seguro de vida") {
 
-                    html += `<div class = "container p-4">
-                            <p><strong> Nombres y apellidos: </strong> ${response.data.names} </p>
-                            <p><strong> Tipo de docuemnto: </strong> ${response.data.tipo_documento} </p>
-                            <p><strong> Numero de docuemento: </strong> ${response.data.id_beneficiario} </p>
-                            <p><strong> Fecha de nacimiento: </strong> ${response.data.fecha_nacimineto}</p>
-                            <p><strong> Sexo: </strong> ${response.data.sexo} </p>
-                            <p><strong> Estado civil: </strong> ${response.data.estado_civil} </p>
-                            <p><strong> Email: </strong> ${response.data.email} </p>
-                            <p><strong> Celular: </strong> ${response.data.celular}</p>
-                            <p><strong> Direccion de domicilio: </strong> ${response.data.direccion}</p>
-                            <p><strong> Ciudad/Municipio: </strong> ${response.data.ciudad} </p>
-                            <p><strong> Ingreso mensual: </strong> ${response.data.ingresos} </p>
-                            <p><strong> Profesion: </strong> ${response.data.profesion} </p>
-                            <p><strong> Consume actualmente algún medicamento: </strong> ${response.data.medicamento} </p>
-                            <p><strong> En caso de consumir medicamento cual: </strong> ${response.data.cual} </p>
-                            <p><strong> A que EPS e IPS está afiliado: </strong> ${response.data.eps_ips} </p>
-                            <p><strong> Dias de seguro adquiridos: </strong>${response.data.dif_dias} dias. (${response.data.fecha})</p>
-                            <p><strong> Dias de seguro restantes: </strong> ${response.data.dias_restantes} dias</p>
-                        </div>`;
+                    html += `<div class="container p-4">
+                                <form id="formulario" class="row">
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Nombres y Apellidos(*)</label>
+                                            <p class="form-control">${response.data.names}</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <div class="mb-3">
+                                            <label for="nit" class="form-label fw-semibold">Tipo de documento(*)</label>
+                                            <p class="form-control">${response.data.tipo_documento} </p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Numero de documento(*)</label>
+                                            <p class="form-control"> ${response.data.id_beneficiario} </p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Fecha de nacimiento(*)</label>
+                                            <p class="form-control">${response.data.fecha_nacimineto} </p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <label for="ciudad" class="form-label fw-semibold">Sexo(*)</label>
+                                        <p class="form-control">${response.data.sexo} </p>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <label for="ciudad" class="form-label fw-semibold">Estado civil (*)</label>
+                                        <p class="form-control">${response.data.estado_civil} </p>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Email(*)</label>
+                                            <p class="form-control">${response.data.email} </p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Celular</label>
+                                            <p class="form-control">${response.data.celular} </p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Dirección de domicilio</label>
+                                            <p class="form-control">${response.data.direccion} </p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <label for="ciudad" class="form-label fw-semibold">Ciudad/Municipio (*)</label>
+                                        <p class="form-control">${response.data.ciudad} </p>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <label for="ciudad" class="form-label fw-semibold">Ingreso mensual(*)</label>
+                                        <p class="form-control"> ${response.data.ingresos}</p>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <label for="ciudad" class="form-label fw-semibold">Profesión</label>
+                                        <p class="form-control">${response.data.profesion}  </p>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <label for="ciudad" class="form-label fw-semibold">Consume actualmente algún medicamento?</label>
+                                        <p class="form-control">${response.data.medicamento} </p>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <label for="ciudad" class="form-label fw-semibold">En caso de consumir medicamento cual?</label>
+                                        <p class="form-control">${response.data.cual} </p>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <label for="ciudad" class="form-label fw-semibold">A que EPS e IPS está afiliado? (*)</label>
+                                        <p class="form-control">${response.data.eps_ips} </p>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <label for="ciudad" class="form-label fw-semibold">Dias de seguro adquiridos:</label>
+                                        <p class="form-control">${response.data.dif_dias} dias. (${response.data.fecha}) </p>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
+                                        <label for="ciudad" class="form-label fw-semibold"> Dias de seguro restantes:</label>
+                                        <p class="form-control">${response.data.dias_restantes} dias </p>
+                                    </div>
+                                </form>
+                            </div>`;
 
                     $("#datos").html(html);
 

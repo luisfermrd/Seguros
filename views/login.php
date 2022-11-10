@@ -30,10 +30,10 @@
               <a class="nav-link" aria-current="page" href="../index.html">Inicio</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="login.php">Inicia sesión</a>
+              <a class="nav-link" aria-current="page" href="login.php">Iniciar sesión</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="register.php">Registrate</a>
+              <a class="nav-link" aria-current="page" href="register.php">Regístrate</a>
             </li>
           </ul>
         </div>
@@ -42,7 +42,7 @@
   </header>
 <main class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
         <article class="rounded" style="width: 350px; height: 400px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
-            <h1 class="p-4 text-center">Inicia sesión</h1>
+            <h1 class="p-4 text-center">Iniciar sesión</h1>
             <form method="post"  id="formulario">
                 <div class="mb-3 ms-4 me-4">
                     <input type="email" class="form-control" name="email" id="email" aria-describedby="helpId"

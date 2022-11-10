@@ -17,22 +17,22 @@ include_once('header.php');
     <div class="container m-sm-5 mt-3 bg-light">
         <div class="row">
             <div class="col ms-3">
-                <h1 class="fs-3">Formulario de seguro de vida</h1>
+                <h1 class="fs-3 text-primary">Formulario de seguro de vida</h1>
             </div>
             <div class="container p-4">
                 <form id="formulario" method="post" class="row">
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
                         <div class="mb-3">
-                            <label class="form-label">Nombres y apellidos(*)</label>
+                            <label class="form-label fw-semibold">Nombres y apellidos(*)</label>
                             <input type="text" name="nombres"  class="form-control" value="<?php echo $_SESSION['names']?>" required minlength="5">
                          </div>
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
                         <div class="mb-3">
-                            <label for="nit" class="form-label">Tipo de docuemnto(*)</label>
+                            <label for="nit" class="form-label fw-semibold">Tipo de documento(*)</label>
                             <select name="tipo_documento" class="form-select" required value="<?php $_SESSION['tipo_documento'] ?>">
-                                <option value="Cedula de ciudadania" <?php $a = ($_SESSION['tipo_documento'] == "Cedula de ciudadania")? "selected":""; echo $a; ?>>Cedula de ciudadania</option>
-                                <option value="Cedula de extrangeria" <?php $a = ($_SESSION['tipo_documento'] == "Cedula de extrangeria")? "selected":""; echo $a; ?>>Cedula de extrangeria</option>
+                                <option value="Cedula de ciudadania" <?php $a = ($_SESSION['tipo_documento'] == "Cedula de ciudadania")? "selected":""; echo $a; ?>>Cedula de ciudadanía</option>
+                                <option value="Cedula de extranjeria" <?php $a = ($_SESSION['tipo_documento'] == "Cedula de extranjeria")? "selected":""; echo $a; ?>>Cedula de extranjería</option>
                                 <option value="Tarjeta de identidad" <?php $a = ($_SESSION['tipo_documento'] == "Tarjeta de identidad")? "selected":""; echo $a; ?>>Tarjeta de identidad</option>
                                 <option value="Pasaporte" <?php $a = ($_SESSION['tipo_documento'] == "Pasaporte")? "selected":""; echo $a; ?>>Pasaporte</option>
                             </select>
@@ -40,25 +40,25 @@ include_once('header.php');
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
                         <div class="mb-3">
-                            <label class="form-label">Numero de docuemento(*)</label>
+                            <label class="form-label fw-semibold">Numero de documento(*)</label>
                             <input  type="number" name="num_documento" class="form-control" value="<?php echo $_SESSION['id']?>" required maxlength="10">
                         </div>
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
                         <div class="mb-3">
-                            <label class="form-label">Fecha de nacimiento(*)</label>
+                            <label class="form-label fw-semibold">Fecha de nacimiento(*)</label>
                             <input  type="date" name="fecha_nacimiento" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
-                        <label for="ciudad" class="form-label">Sexo(*)</label>
+                        <label for="ciudad" class="form-label fw-semibold">Sexo(*)</label>
                         <div>
                             <input type="radio" name="sexo" value="Femenino" required> <label>Femenino</label><br>
                             <input type="radio" name="sexo" value="Masculino"> <label>Masculino</label>
                         </div>
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
-                        <label for="ciudad" class="form-label">Estado civil (*))</label>
+                        <label for="ciudad" class="form-label fw-semibold">Estado civil (*)</label>
                         <div class="row">
                             <div class="col-6">
                                 <input type="radio" name="estado_civil" value="Soltero" required> <label>Soltero</label><br>
@@ -76,59 +76,59 @@ include_once('header.php');
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
                         <div class="mb-3">
-                            <label class="form-label">Email(*)</label>
+                            <label class="form-label fw-semibold">Email(*)</label>
                             <input  type="email" name="email" class="form-control" value="<?php echo $_SESSION['email']?>" required>
                         </div>
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
                         <div class="mb-3">
-                            <label class="form-label">Celular</label>
+                            <label class="form-label fw-semibold">Celular</label>
                             <input  type="number" name="celular" class="form-control">
                         </div>
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
                         <div class="mb-3">
-                            <label class="form-label">Direccion de domicilio</label>
+                            <label class="form-label fw-semibold">Direccion de domicilio</label>
                             <input type="text" name="direccion" class="form-control" minlength="5" required>
                         </div>
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
-                        <label for="ciudad" class="form-label">Ciudad/Municipio (*)</label>
+                        <label for="ciudad" class="form-label fw-semibold">Ciudad/Municipio (*)</label>
                         <input type="text" name="ciudad" class="form-control" minlength="5" required>
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
-                        <label for="ciudad" class="form-label">Ingreso mensual(*)</label>
+                        <label for="ciudad" class="form-label fw-semibold">Ingreso mensual(*)</label>
                         <input type="number" name="ingreso" class="form-control" required>
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
-                        <label for="ciudad" class="form-label">Profesion</label>
+                        <label for="ciudad" class="form-label fw-semibold">Profesion</label>
                         <input type="text" name="profesion" class="form-control">
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
-                        <label for="ciudad" class="form-label">Consume actualmente algún medicamento?</label>
+                        <label for="ciudad" class="form-label fw-semibold">Consume actualmente algún medicamento?</label>
                         <div>
                             <input type="radio" name="medicamento" value="Si"> <label>Si</label><br>
                             <input type="radio" name="medicamento" value="No"> <label>No</label>
                         </div>
                     </div> 
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
-                        <label for="ciudad" class="form-label">En caso de consumir medicamento cual?</label>
+                        <label for="ciudad" class="form-label fw-semibold">En caso de consumir medicamento cual?</label>
                         <input type="text" name="cual" class="form-control">
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
-                        <label for="ciudad" class="form-label">A que EPS e IPS está afiliado? (*)</label>
+                        <label for="ciudad" class="form-label fw-semibold">A que EPS e IPS está afiliado? (*)</label>
                         <input type="text" name="eps_ips" class="form-control" required>
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
-                        <label for="ciudad" class="form-label">Fecha de inicio del seguro</label>
+                        <label for="ciudad" class="form-label fw-semibold">Fecha de inicio del seguro</label>
                             <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control">
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
-                        <label for="ciudad" class="form-label">Fecha de finalización del seguro</label>
+                        <label for="ciudad" class="form-label fw-semibold">Fecha de finalización del seguro</label>
                         <input type="date" name="fecha_fin" id="fecha_fin" class="form-control">
                     </div>
                     <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 mt-2">
-                        <label for="tipo_seguro" class="form-label">Seleccione un plan</label>
+                        <label for="tipo_seguro" class="form-label fw-semibold">Seleccione un plan</label>
                         <select name="tipo_seguro" class="form-select" required>
                             <option value="basico">Básico</option>
                             <option value="estandar">Estándar</option>
