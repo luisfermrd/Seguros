@@ -95,10 +95,10 @@ if (!isset($_SESSION["names"]) || $_SESSION['rol'] != 1) {
           <div class="modal-body">
             <form method="post" id="formulario">
               <div class="mb-3 ms-4 me-4">
-                <input type="text" class="form-control" name="id" id="id" aria-describedby="helpId" placeholder="Id" required>
+                <input type="text" class="form-control" name="id" id="id" aria-describedby="helpId" readonly onmousedown="return false;" >
               </div>
               <div class="mb-3 ms-4 me-4">
-                <input type="text" class="form-control" name="tipo" id="tipo" aria-describedby="helpId" placeholder="Tipo de plan" required>
+                <input type="text" class="form-control" name="tipo" id="tipo" aria-describedby="helpId" readonly onmousedown="return false;">
               </div>
               <div class="mb-3 ms-4 me-4">
                 <input type="text" class="form-control" name="basico" id="basico" aria-describedby="helpId" placeholder="Básico" required>
@@ -112,7 +112,7 @@ if (!isset($_SESSION["names"]) || $_SESSION['rol'] != 1) {
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Modificar</button>
+            <button type="submit" class="btn btn-primary" >Modificar</button>
           </div>
         </div>
       </div>

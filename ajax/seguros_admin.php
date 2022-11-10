@@ -99,7 +99,6 @@ class Admin{
         $result4 =mysqli_query($db->dbcon,$sql4);
         $row4 = mysqli_fetch_array($result4);
 
-        $db->auditoria($id_usuario, 'Esta en el inicio de admin');
 
         $data = array("num_clientes"=>$row['num_clientes'],
                     "num_usuarios"=>$row2['num_usuarios'],
@@ -213,14 +212,14 @@ class Admin{
     }
 
     // terminar de hacer 
-    public static function actualizarPlan($id){
+    public static function actualizarPlan($id_usuario, $id, $basico, $estandar, $premiun){
         $db = self::$instance;
-        $sql="UPDATE cotizar SET basico='basico',estandar='estandar',premiun='premiun' WHERE id = '$id'";
+        $sql="UPDATE cotizar SET basico='$basico',estandar='$estandar',premiun='$premiun' WHERE id = '$id'";
         $result =mysqli_query($db->dbcon,$sql);
 
         if($result){
-            $db->auditoria($id, 'Modifico los precios del plan con id: '.$id);
-            echo json_encode(array("status"=>1,"message"=>"El ususario con el id: ".$id.", se ha modificado!"));
+            $db->auditoria($id_usuario, 'Modifico los precios del plan con id: '.$id);
+            echo json_encode(array("status"=>1,"message"=>"Los valores del seguro, se ha modificado!"));
         }else{
             echo json_encode(array("status"=>-1,"message"=>"Error, algo salio mal"));
         }
@@ -319,6 +318,11 @@ switch ($_GET["opcion"]) {
     break;
 
     case 'modificacionPlan':
-        $obj->actualizarPlan($id);
+        $conexion = $obj->getDBConexion();
+        $id=isset($_POST["id"])? $obj->limpiarCadena($_POST["id"]):"";
+        $basico=isset($_POST["basico"])? $obj->limpiarCadena($_POST["basico"]):"";
+        $estandar=isset($_POST["estandar"])? $obj->limpiarCadena($_POST["estandar"]):"";
+        $premiun=isset($_POST["premiun"])? $obj->limpiarCadena($_POST["premiun"]):"";
+        $obj->actualizarPlan($id_usuario, $id, $basico, $estandar, $premiun);
     break;
 }
